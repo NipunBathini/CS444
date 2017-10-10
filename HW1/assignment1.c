@@ -32,8 +32,49 @@ struct Container {
 	
 };
 
-//int SystemToggle;
+int SystemType();
+int getRandomNum(int min, int max);
+void *producerFoo(void *prods);
+void *consumerFoo(void *cons);
 
+int main(int argc, char* argv[]){
+	int pairs;
+	
+	//adds ability to run more than one pair of threads
+	if(argc <= 1){
+		pairs = 1;
+	}
+	else{
+		pairs = atoi(argv[1]);
+	}
+	
+	//check the type of the current system
+	SystemType();
+	
+	//initialize buffer object
+	A.consumer = 0;
+	A.producer = 0;
+	
+	pthread_t threads[2 * pairs];
+	
+	int i;
+	for(i = 0; i < pairs; i++){
+		pthread_create(&threads[i], NULL, consumerFoo, NULL);
+		pthread_create(&threads[i+1], NULL, producerFoo, NULL);
+	}
+	
+	for(i = 0; i < (2 * pairs); i++){
+		pthread_join(threads[i], NULL);
+	}
+	
+	return 0;
+}
+
+
+
+
+
+//checks the system type 32 vs 64
 int SystemType(){
 	//registers
 	unsigned int eax = 0x01;
@@ -47,7 +88,7 @@ int SystemType(){
 							 : "a"(eax)
 							 );
 		
-	if(ecx & 0x40000000){//32 bit bitwise& operation
+	if(ecx & 0x40000000){//32 bit bitwise operation
 		SystemToggle = 1;
 	}
 	else{//64 bit
@@ -57,15 +98,6 @@ int SystemType(){
 	return SystemToggle;
 }
 
-void printData(DATA *Item){
-	static int counter = 0;
-	
-	printf("%d:", counter);
-	counter++;
-	
-	printf("\tItem #: %d\n", Item->numb);
-	printf("Item wait: %d\n\n", Item->wait);
-}
 
 int getRandomNum(int min, int max){
 	int randomNum = 0; // will store the random number
@@ -86,57 +118,36 @@ int getRandomNum(int min, int max){
 }
 
 
-
-void *consumerFoo(void *cons){
-	while(1){
-		pthread_mutex_lock(&A.Lock);
-		DATA takeItem;
-		
-		if(A.consumer >= 32){
-			A.consumer = 0;
-		}
-		
-		pthread_cond_signal(&(A.producerCond)); //signal that consumer is ready
-		pthread_cond_wait(&(A.consumerCond), &A.Lock);
-		
-		if(A.producer == 0){
-			printf("Reached Max!!!!!!\n");
-			pthread_cond_wait(&(A.consumerCond), &A.Lock);
-		}
-		
-		takeItem = A.items[A.consumer];
-		printf("--Consuming item: %d\n\n", takeItem.numb);
-		sleep(takeItem.wait);
-		printf("--Consumed item: %d\n\n", takeItem.numb);
-		A.consumer++;
-		
-		pthread_mutex_unlock(&A.Lock);
-	}
-}
-
 void *producerFoo(void *prods){
 	while(1){
-		pthread_mutex_lock(&A.Lock);
+		pthread_mutex_lock(&A.Lock); //lock thread to prevent data collision
 		
-		DATA newItem;
+		DATA newItem; //create new item object
 		
+		//create data for item using random fuctions
 		newItem.numb = getRandomNum(1,100);
-		newItem.wait = getRandomNum(2,9);
-		printf("Produced Item: ");
-		printData(&newItem);
+		newItem.wait = getRandomNum(1,9);
 		
+		printf("Produced Item! ");
+		printf("\tItem #: %d\n", newItem.numb);
+		printf("Item wait: %d\n\n", newItem.wait);
+		
+		//if producer buffer is full tell consumer to take an item from buffer
 		if(A.producer == 32){
 			printf("Reached Max, BUFFER FULL!!\n\n");
 			pthread_cond_signal(&(A.consumerCond));
 			pthread_cond_wait(&(A.producerCond), &A.Lock);
 		}
 		
+		//if not full, put new item in buffer
 		A.items[A.producer] = newItem;
 		A.producer++; 
 		
+		//tell consumer to take from buffer
 		pthread_cond_signal(&(A.consumerCond));
 		pthread_cond_wait(&(A.producerCond), &A.Lock);
 		
+		//wrap the buffer around if it is full
 		if(A.producer >= 32){
 			printf("Reached Max, BUFFER FULL!!\n\n");
 			A.producer = 0;
@@ -146,36 +157,35 @@ void *producerFoo(void *prods){
 	}
 }
 
-int main(int argc, char* argv[]){
-	int pairs;
-	
-	if(argc <= 1){
-		pairs = 1;
+
+void *consumerFoo(void *cons){
+	while(1){
+		pthread_mutex_lock(&A.Lock); //locks the thread so no other threads can collide with the data
+		DATA takeItem;
+		
+		if(A.consumer >= 32){ //resize the buffer if needed
+			A.consumer = 0;
+		}
+		
+		pthread_cond_signal(&(A.producerCond)); //send signal to producer a that consumer is ready
+		pthread_cond_wait(&(A.consumerCond), &A.Lock); //waits for producer
+		
+		if(A.producer == 0){
+			printf("Nothing to consume!\n");
+			pthread_cond_wait(&(A.consumerCond), &A.Lock); // wait for production
+		}
+		
+		//after item has been produced, begin consumption based on items data
+		takeItem = A.items[A.consumer];
+		printf("Consuming item: %d....\n", takeItem.numb);
+		sleep(takeItem.wait);
+		printf("Consumed item: %d!!!!\n\n", takeItem.numb);
+		A.consumer++; //move to next spot in item buffer
+		
+		pthread_mutex_unlock(&A.Lock); //unlock so more threads can use the data
 	}
-	else{
-		pairs = atoi(argv[1]);
-	}
-	
-	SystemType();
-	
-	A.consumer = 0;
-	A.producer = 0;
-	
-	pthread_t threads[2 * pairs];
-	
-	int i;
-	
-	for(i = 0; i < pairs; i++){
-		pthread_create(&threads[i], NULL, consumerFoo, NULL);
-		pthread_create(&threads[i+1], NULL, producerFoo, NULL);
-	}
-	
-	for(i = 0; i < (2 * pairs); i++){
-		pthread_join(threads[i], NULL);
-	}
-	
-	return 0;
 }
+
 		
 	
 	
