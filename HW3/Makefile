@@ -1,8 +1,32 @@
-obj-m := ebd.o
-KDIR := /scratch/fall2017/20/linux-yocto-3.19/
-PWD_C := $(shell pwd)
+filename=WriteUp
 
-default:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD_C) modules
+pdf: ps
+	ps2pdf ${filename}.ps
+
+pdf-print: ps
+	ps2pdf -dColorConversionStrategy=/LeaveColorUnchanged -dPDFSETTINGS=/printer ${filename}.ps
+
+text: html
+	html2text -width 100 -style pretty ${filename}/${filename}.html | sed -n '/./,$$p' | head -n-2 >${filename}.txt
+
+html:
+	@#latex2html -split +0 -info "" -no_navigation ${filename}
+	htlatex ${filename}
+
+ps:	dvi
+	dvips -t letter ${filename}.dvi
+
+dvi:
+	latex ${filename}
+	bibtex ${filename}||true
+	latex ${filename}
+	latex ${filename}
+
+read:
+	evince ${filename}.pdf &
+
+aread:
+	acroread ${filename}.pdf
+
 clean:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD_C) clean
+	rm -f ${filename}.{ps,log,aux,out,dvi,bbl,blg}
