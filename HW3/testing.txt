@@ -1,5 +1,7 @@
 TESTING
 
+0. makefile for ebd.c is in the folder "moduleMakefile" if needed.
+
 1. qemu command line modification to allow for module access by kernel "qemu-system-i386 -gdb tcp::5520 -S -nographic -kernel bzImage-qemux86.bin -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug" -redir tcp:6005::22"
 
 2. in the module folder use this command to connect to kernel: scp -P 6005 ebd.ko root@localhost:/home/root
