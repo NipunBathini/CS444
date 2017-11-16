@@ -1,0 +1,123 @@
+\documentclass[onecolumn, draftclsnofoot,10pt, compsoc]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{setspace}
+
+\usepackage{geometry}
+\geometry{textheight=9.5in, textwidth=7in}
+\usepackage{hyperref}
+
+\def \DocType{		WriteUp
+				}
+			
+\newcommand{\NameSigPair}[1]{\par
+\makebox[2.75in][r]{#1} \hfil 	\makebox[3.25in]{\makebox[2.25in]{\hrulefill} \hfill		\makebox[.75in]{\hrulefill}}
+\par\vspace{-12pt} \textit{\tiny\noindent
+\makebox[2.75in]{} \hfil		\makebox[3.25in]{\makebox[2.25in][r]{Signature} \hfill	\makebox[.75in][r]{Date}}}}
+% 3. If the document is not to be signed, uncomment the RENEWcommand below
+\renewcommand{\NameSigPair}[1]{#1}
+
+
+
+
+%group members: Nipun Bathini, Parker Bruni
+%group number: 20
+
+
+
+
+\begin{document}
+
+\pagenumbering{arabic}
+
+
+\section{Design Plan}
+
+		We plan to implement encryption techniques that are already built into the linux kernel,
+		specifically using linux/crypto.h library. We will simply use this libraries API
+		to encrypt our data before we write to the device, and decrypt our data before we read from the
+		device. 
+	
+\section{Questions}
+	\begin{enumerate}
+		\item \textbf{What do you think the main point of this assignment is?}
+	
+		We believe that the point of this assignment was to help us understand a linux kernel
+		environment enough to create a block driver module and encrypt/decrypt data that is 
+		transferred to and from it (I/O). This will help us understand the linux kernel and its
+		functionality better so if we ever need to develop a device driver we will have the foundation
+		to do so. 
+		
+		\item \textbf{How did you personally approach the problem? Design decisions, algorithm, etc.}
+	
+		We studied online about linux kernel drivers and modular drivers within the linux environment
+		until we had a decent enough foundation to begin our project. We referenced online resources
+		about linux device driver modules templates and added encryption methods and specifications
+		to that template. We used the build in encryption library within linux "linux/crypto.h" to 
+		encrypt and decrypt data from the virtual device as the data was written/read to/from the device.
+		
+		\item \textbf{How did you ensure your solution was correct? Testing details, for instance.}
+			
+		To ensure the solution was correct we utilized print statements within the code that
+		would print the requested raw data before and after it was encrypted.
+		This was to insure that the data was being properly encrypted before it was written to the device. 
+		When the data was being read from the device our method was to print the encrypted cipher text of the 
+		data to the terminal before it was decrypted and then print the raw data after it was decrypted.
+		This was also to ensure that the data was being read and decrypted incorrectly. When testing our decryption
+		via the key we simply changed the key within the code to use false key before decrypting, which would print garbage 
+		data to the terminal. This proves that our key is being used for the correct encryption/decryption method.
+		
+		\item \textbf{What did you learn?}
+	
+		We learned more about the linux kernel and the linux OS as a whole and learned how to create
+		modules within that environment. We learned about linux I/O encryption methods as well as methods for
+		creating block device driver and communicating with a block device via the driver using the kernel. 
+		
+	\end{enumerate}
+
+\section{Version Control Log}
+
+\begin{tabular}{l l p{1.5in}}\textbf{Detail} & \textbf{Author} & \textbf{Description}\\\hline
+	\href{https://github.com/NipunBathini/CS444/commit/1f3b2a036147a44d34f40c35604f5de969bdff76}{1f4b2a0} & Nipun & edit testing.txt\\\hline
+	\href{https://github.com/NipunBathini/CS444/commit/faf83c302ee3c7cb1bab2586d302d8ff32c45602}{faf83c3} & Nipun & Added makefile and reorganized\\\hline
+	\href{https://github.com/NipunBathini/CS444/commit/8787e9f738301c57976a08a0b3fadb9d79f1dfca}{8787e9f} & Nipun & Add patch file\\\hline
+	\href{https://github.com/NipunBathini/CS444/commit/fe97fd648f38c2c9365bf1304f82c12b462905f4}{fe97fd6} & Nipun & First Add of File\\\hline
+	\end{tabular}
+	
+
+\section{Work log}
+
+	11/7: began research on device drivers/devices in linux
+	
+	11/7: began research on modules in linux
+	
+	11/7:  began research on I/O encryption methods in linux
+	
+	11/7: began latex write up file
+	
+	11/8: searched for block driver module templates
+	
+	11/8: searched for encryption method templates
+	
+	11/8: began work on .c file for the driver module
+	
+	11/8: continued work on latex write-up
+	
+	11/9: continued work on .c file for the driver module finished applying template moduel
+	
+	11/9: continued work on latex write-up
+	
+	11/10: continued work on .c file for the driver module added I/O encryption
+	
+	11/10: continued work on latex write-up
+	
+	11/10: testing
+	
+	11/11: continued work on .c file for the driver module added I/O encryption
+	
+	11/11: continued work on latex write-up
+	
+	11/11: testing
+	
+
+\end{document}
