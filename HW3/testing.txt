@@ -1,0 +1,17 @@
+TESTING
+
+1. qemu command line modification to allow for module access by kernel "qemu-system-i386 -gdb tcp::5520 -S -nographic -kernel bzImage-qemux86.bin -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug" -redir tcp:6005::22"
+
+2. in the module folder use this command to connect to kernel: scp -P 6005 ebd.ko root@localhost:/home/root
+
+3. in the kernel command line: insmod ~/ebd.ko 
+
+		this inserts the driver into the kernel space
+
+4. in the kernel command line: mkfs.ext2 /dev/ebd0 (gives expected error)
+
+5. in the kernel command line: mount -t ext2 /dev/ebd/ /mont/
+
+6. simply echo a sample text into /mont/testfile, print statements within our ebd driver code will print statements that display the raw sample text before sending and the
+	encrypted sample text after, you may also check the test file for encrypted data. When reading, the could will output the encrypted sample text and then 
+	the decrypted sample text.

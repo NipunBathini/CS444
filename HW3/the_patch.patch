@@ -1,0 +1,28 @@
+--- Kconfigdef	2017-11-15 22:49:50.066590000 -0800
++++ Kconfig	2017-11-15 22:49:50.045814000 -0800
+@@ -41,6 +41,12 @@
+ 	tristate "Atari floppy support"
+ 	depends on ATARI
+ 
++config EBD
++	tristate "Assignmnet 3 CS444"
++	default m
++	depends on BLK_DEV_CRYPTOLOOP
++	help
++          default help message
+            
+ config MAC_FLOPPY
+ 	tristate "Support for PowerMac floppy"
+
+	
+--- Makefiledef	2017-11-15 22:49:49.980207000 -0800
++++ Makefile	2017-11-15 22:49:49.961691000 -0800
+@@ -34,7 +34,7 @@
+ obj-$(CONFIG_BLK_DEV_SX8)	+= sx8.o
+ obj-$(CONFIG_BLK_DEV_HD)	+= hd.o
+ 
+-          
++obj-$(CONFIG_EBD)               += ebd.o              
+ 
+ obj-$(CONFIG_XEN_BLKDEV_FRONTEND)	+= xen-blkfront.o
+ obj-$(CONFIG_XEN_BLKDEV_BACKEND)	+= xen-blkback/
